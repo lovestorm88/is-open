@@ -17,7 +17,7 @@ import (
 	"strings"
 	"time"
 
-	"code.aliyun.com/is/is-open/go/picrecogsdk"
+	"github.com/lovestorm88/is-open/go/picrecogsdk"
 )
 
 func testPornRecog1(path string) error {
