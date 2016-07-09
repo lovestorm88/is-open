@@ -1,21 +1,10 @@
 package main
 
 import (
-	"bytes"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/base64"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
-	"mime/multipart"
-	"net/http"
-	"net/url"
 	"os"
-	"sort"
-	"strings"
-	"time"
 
 	"github.com/lovestorm88/is-open/go/picrecogsdk"
 )
