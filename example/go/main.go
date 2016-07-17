@@ -5,22 +5,30 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/lovestorm88/is-open/go/picrecogsdk"
 )
 
-func testPornRecog1(path string) error {
+const (
+	PublicKey  = "publicKey_test"
+	PrivateKey = "privateKey_test"
+	Userid     = "userid_test"
+)
+
+func pornRecog(filePath string) error {
 	var (
 		host = "http://localhost:8087"
 		uri  = "/api/porn-recog"
 	)
 
-	picrecogsdk.PublicKey = "publicKey_test"
-	picrecogsdk.PrivateKey = "privateKey_test"
-	picrecogsdk.Userid = "userid_test"
+	picrecogsdk.PublicKey = PublicKey
+	picrecogsdk.PrivateKey = PrivateKey
+	picrecogsdk.Userid = Userid
 
-	file, err := os.Open(path)
+	file, err := os.Open(filePath)
 	if err != nil {
+		fmt.Println("os.Open err")
 		return err
 	}
 	defer file.Close()
@@ -30,6 +38,7 @@ func testPornRecog1(path string) error {
 	filename := file.Name()
 	res, err := picrecogsdk.UploadFileData(fmt.Sprintf("%s%s", host, uri), params, filename, file)
 	if err != nil {
+		fmt.Println("UploadFileData err")
 		return err
 	}
 
@@ -52,13 +61,27 @@ func testPornRecog1(path string) error {
 	return err
 }
 
+func testPornRecog(rootPath string) {
+	filepath.Walk(rootPath, func(path string, fi os.FileInfo, err error) error {
+		if fi == nil {
+			return err
+		}
+		if fi.IsDir() {
+			return nil
+		}
+
+		err = pornRecog(path)
+		if err != nil {
+			log.Printf("testPornRecog fail:%s,path:%s\n", err.Error(), path)
+		} else {
+			log.Printf("testPornRecog success,path:%s\n", path)
+		}
+		return nil
+	})
+}
+
 func main() {
-	path := "../resource/1.jpg"
-	err := testPornRecog1(path)
-	if err != nil {
-		log.Printf("testPornRecog1 fail:%s,path:%s\n", err.Error(), path)
-	} else {
-		log.Printf("testPornRecog1 success,path:%s\n", path)
-	}
+	rootPath := "../resource"
+	testPornRecog(rootPath)
 
 }
