@@ -10,17 +10,16 @@ import (
 	"github.com/lovestorm88/is-open/go/picrecogsdk"
 )
 
+//以下参数需要根据实际情况修改
 const (
 	PublicKey  = "publicKey_test"
 	PrivateKey = "privateKey_test"
 	Userid     = "userid_test"
+	Host       = "http://localhost:8087"
 )
 
 func pornRecog(filePath string) error {
-	var (
-		host = "http://localhost:8087"
-		uri  = "/api/porn-recog"
-	)
+	uri := "/api/porn-recog"
 
 	picrecogsdk.PublicKey = PublicKey
 	picrecogsdk.PrivateKey = PrivateKey
@@ -36,7 +35,7 @@ func pornRecog(filePath string) error {
 	params := picrecogsdk.SignedRequest(uri)
 
 	filename := file.Name()
-	res, err := picrecogsdk.UploadFileData(fmt.Sprintf("%s%s", host, uri), params, filename, file)
+	res, err := picrecogsdk.UploadFileData(fmt.Sprintf("%s%s", Host, uri), params, filename, file)
 	if err != nil {
 		fmt.Println("UploadFileData err")
 		return err
