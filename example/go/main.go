@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -16,6 +17,10 @@ const (
 	PrivateKey = "privateKey_test"
 	Userid     = "userid_test"
 	Host       = "http://localhost:8087"
+)
+
+var (
+	picPath = flag.String("path", "../resource", "pictures path")
 )
 
 func pornRecog(filePath string) error {
@@ -80,7 +85,7 @@ func testPornRecog(rootPath string) {
 }
 
 func main() {
-	rootPath := "../resource"
-	testPornRecog(rootPath)
+	flag.Parse()
 
+	testPornRecog(*picPath)
 }
