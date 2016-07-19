@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/lovestorm88/is-open/go/picrecogsdk"
 )
@@ -20,10 +21,11 @@ const (
 )
 
 var (
+	host    = flag.String("host", "http://localhost:8087", "host url")
 	picPath = flag.String("path", "../resource", "pictures path")
 )
 
-func pornRecog(filePath string) error {
+func pornRecog(host, filePath string) error {
 	uri := "/api/porn-recog"
 
 	picrecogsdk.PublicKey = PublicKey
@@ -40,7 +42,7 @@ func pornRecog(filePath string) error {
 	params := picrecogsdk.SignedRequest(uri)
 
 	filename := file.Name()
-	res, err := picrecogsdk.UploadFileData(fmt.Sprintf("%s%s", Host, uri), params, filename, file)
+	res, err := picrecogsdk.UploadFileData(fmt.Sprintf("%s%s", host, uri), params, filename, file)
 	if err != nil {
 		fmt.Println("UploadFileData err")
 		return err
@@ -65,7 +67,7 @@ func pornRecog(filePath string) error {
 	return err
 }
 
-func testPornRecog(rootPath string) {
+func testPornRecog(host, rootPath string) {
 	filepath.Walk(rootPath, func(path string, fi os.FileInfo, err error) error {
 		if fi == nil {
 			return err
@@ -74,11 +76,13 @@ func testPornRecog(rootPath string) {
 			return nil
 		}
 
-		err = pornRecog(path)
+		st := time.Now().UnixNano()
+		err = pornRecog(host, path)
+		et := time.Now().UnixNano()
 		if err != nil {
-			log.Printf("testPornRecog fail:%s,path:%s\n", err.Error(), path)
+			log.Printf("testPornRecog fail:%s,use:%d,path:%s\n", err.Error(), et-st, path)
 		} else {
-			log.Printf("testPornRecog success,path:%s\n", path)
+			log.Printf("testPornRecog success,use:%d,path:%s\n", et-st, path)
 		}
 		return nil
 	})
@@ -87,5 +91,5 @@ func testPornRecog(rootPath string) {
 func main() {
 	flag.Parse()
 
-	testPornRecog(*picPath)
+	testPornRecog(*host, *picPath)
 }
