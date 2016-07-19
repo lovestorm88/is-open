@@ -21,8 +21,9 @@ const (
 )
 
 var (
-	host    = flag.String("host", "http://localhost:8087", "host url")
-	picPath = flag.String("path", "../resource", "pictures path")
+	host     = flag.String("host", "http://localhost:8087", "host url")
+	picPath  = flag.String("path", "../resource", "pictures path")
+	cocurent = flag.Int("cocurrent", 1, "cocurrent number")
 )
 
 func pornRecog(host, filePath string) error {
@@ -91,5 +92,7 @@ func testPornRecog(host, rootPath string) {
 func main() {
 	flag.Parse()
 
-	testPornRecog(*host, *picPath)
+	for i := 0; i < *cocurent; i++ {
+		go testPornRecog(*host, *picPath)
+	}
 }
