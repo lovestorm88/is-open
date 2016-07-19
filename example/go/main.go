@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/lovestorm88/is-open/go/picrecogsdk"
@@ -68,7 +69,9 @@ func pornRecog(host, filePath string) error {
 	return err
 }
 
-func testPornRecog(host, rootPath string) {
+func testPornRecog(wg *sync.WaitGroup, host, rootPath string) {
+	defer wg.Done()
+
 	filepath.Walk(rootPath, func(path string, fi os.FileInfo, err error) error {
 		if fi == nil {
 			return err
@@ -91,8 +94,12 @@ func testPornRecog(host, rootPath string) {
 
 func main() {
 	flag.Parse()
+	var wg sync.WaitGroup
 
 	for i := 0; i < *cocurent; i++ {
-		go testPornRecog(*host, *picPath)
+		wg.Add(1)
+		go testPornRecog(&wg, *host, *picPath)
 	}
+
+	wg.Wait()
 }
