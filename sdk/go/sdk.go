@@ -1,4 +1,4 @@
-package picrecogsdk
+package sdk
 
 import (
 	"bytes"
