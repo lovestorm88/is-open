@@ -58,8 +58,8 @@ func SignedRequest2(uri, publicKey, privateKey, userid string) map[string]string
 
 	canonicalized_querys := make([]string, 0, len(params))
 	for _, key := range sorted_keys {
-		key = strings.Replace(url.QueryEscape(key), "%7E", "~", -1)
-		value := strings.Replace(url.QueryEscape(params[key]), "%7E", "~", -1)
+		key = url.QueryEscape(key)
+		value := url.QueryEscape(params[key])
 		canonicalized_querys = append(canonicalized_querys, fmt.Sprintf("%s=%s", key, value))
 	}
 
@@ -72,8 +72,7 @@ func SignedRequest2(uri, publicKey, privateKey, userid string) map[string]string
 	signature := computeHmac256(string_to_sign, privateKey)
 
 	// encode the signature for the request
-	signature = strings.Replace(url.QueryEscape(signature), "%7E", "~", -1)
-	//signature = strings.Replace(signature, "%2F", "/", -1)
+	signature = url.QueryEscape(signature)
 	params["signature"] = signature
 
 	return params
