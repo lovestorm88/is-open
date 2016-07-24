@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lovestorm88/is-open/go/picrecogsdk"
+	sdk "github.com/lovestorm88/is-open/sdk/go"
 )
 
 //以下参数需要根据实际情况修改
@@ -28,11 +28,9 @@ var (
 )
 
 func pornRecog(host, filePath string) error {
-	uri := "/api/porn-recog"
-
-	picrecogsdk.PublicKey = PublicKey
-	picrecogsdk.PrivateKey = PrivateKey
-	picrecogsdk.Userid = Userid
+	sdk.PublicKey = PublicKey
+	sdk.PrivateKey = PrivateKey
+	sdk.Userid = Userid
 
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -41,10 +39,8 @@ func pornRecog(host, filePath string) error {
 	}
 	defer file.Close()
 
-	params := picrecogsdk.SignedRequest(uri)
-
 	filename := file.Name()
-	res, err := picrecogsdk.UploadFileData(fmt.Sprintf("%s%s", host, uri), params, filename, file)
+	res, err := sdk.PicRecog(host, sdk.PIC_RECOG_PORN, filename, file)
 	if err != nil {
 		fmt.Println("UploadFileData err")
 		return err
@@ -96,10 +92,14 @@ func main() {
 	flag.Parse()
 	var wg sync.WaitGroup
 
+	st := time.Now().Unix()
 	for i := 0; i < *cocurent; i++ {
 		wg.Add(1)
 		go testPornRecog(&wg, *host, *picPath)
 	}
+
+	et := time.Now().Unix()
+	log.Printf("total use:%d\n", et-st)
 
 	wg.Wait()
 }
