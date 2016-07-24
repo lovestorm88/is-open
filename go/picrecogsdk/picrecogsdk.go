@@ -16,8 +16,13 @@ import (
 )
 
 const (
-	method  = "POST"
-	version = "2016-06-29"
+	METHOD  = "POST"
+	VERSION = "1"
+)
+
+//图片识别类型
+const (
+	PIC_RECOG_PORN = "/api/porn-recog"
 )
 
 var (
@@ -34,17 +39,17 @@ func computeHmac256(message string, secret string) string {
 }
 
 func SignedRequest(uri string) map[string]string {
-	return SignedRequest2(uri, PublicKey, PrivateKey, Userid)
+	return signedRequest(uri, PublicKey, PrivateKey, Userid)
 }
 
-func SignedRequest2(uri, publicKey, privateKey, userid string) map[string]string {
+func signedRequest(uri, publicKey, privateKey, userid string) map[string]string {
 	params := make(map[string]string)
 
 	params["publicKey"] = publicKey
 
 	params["timestamp"] = time.Now().UTC().Format("2006-01-02T15:04:05Z")
 
-	params["version"] = version
+	params["version"] = VERSION
 
 	params["userid"] = userid
 
@@ -66,7 +71,7 @@ func SignedRequest2(uri, publicKey, privateKey, userid string) map[string]string
 	canonicalized_query := strings.Join(canonicalized_querys, "&")
 
 	// create the string to sign
-	string_to_sign := method + "\n" + uri + "\n" + canonicalized_query
+	string_to_sign := METHOD + "\n" + uri + "\n" + canonicalized_query
 
 	// calculate HMAC with SHA256 and base64-encoding
 	signature := computeHmac256(string_to_sign, privateKey)
@@ -108,7 +113,7 @@ func UploadFileData(url string, params map[string]string, filename string, src i
 	w.Close()
 
 	// Now that you have a form, you can submit it to your handler.
-	req, err := http.NewRequest(method, url, &b)
+	req, err := http.NewRequest(METHOD, url, &b)
 	if err != nil {
 		return
 	}
@@ -128,4 +133,9 @@ func UploadFileData(url string, params map[string]string, filename string, src i
 	}
 
 	return
+}
+
+func PicRecog(host string, picRecogType string, filename string, file io.Reader) (res *http.Response, err error) {
+	params := signedRequest(picRecogType, PublicKey, PrivateKey, Userid)
+	return UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, filename, file)
 }
