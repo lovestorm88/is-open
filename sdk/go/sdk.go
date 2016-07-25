@@ -47,7 +47,7 @@ func signedRequest(uri, publicKey, privateKey, userid string) map[string]string 
 
 	params["publicKey"] = publicKey
 
-	params["timestamp"] = time.Now().UTC().Format("2006-01-02T15:04:05Z")
+	params["timestamp"] = fmt.Sprintf("%d", time.Now().Unix())
 
 	params["version"] = VERSION
 
@@ -89,7 +89,7 @@ func UploadFileData(url string, params map[string]string, filename string, src i
 	w := multipart.NewWriter(&b)
 
 	// Add your image file
-	fw, err := w.CreateFormFile("file", filename)
+	fw, err := w.CreateFormFile("image", filename)
 	if err != nil {
 		return
 	}
