@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -40,27 +39,13 @@ func pornRecog(host, filePath string) error {
 	defer file.Close()
 
 	filename := file.Name()
-	res, err := sdk.PicRecog(host, sdk.PIC_RECOG_PORN, filename, file)
+	brsp, err := sdk.PicRecog(host, sdk.PIC_RECOG_PORN, filename, file)
 	if err != nil {
 		fmt.Println("UploadFileData err")
 		return err
 	}
 
-	result, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Printf("UploadFileData2Gift,ioutil.ReadAll,filename:%s,err:%s", filename, err.Error())
-		return err
-	}
-	defer res.Body.Close()
-
-	/*var data map[string]interface{}
-	err = json.Unmarshal(result, &data)
-	if err != nil {
-		log.Printf("UploadFileData2Gift,Unmarshal,filename:%s,result:%s", filename, result)
-		return err
-	}*/
-
-	fmt.Println(string(result))
+	fmt.Println(brsp)
 
 	return err
 }

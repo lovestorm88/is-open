@@ -5,8 +5,10 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -24,6 +26,26 @@ const (
 const (
 	PIC_RECOG_PORN = "/api/porn-recog"
 )
+
+//公共结果部分
+type CommonRsp struct {
+	ErrCode int32  `json:"errCode"`
+	Msg     string `json:"msg"`
+}
+
+//图片检测
+type PicRecogRsp struct {
+	CommonRsp
+	Name       string  `json:"name"`
+	Label      int     `json:"label"`
+	Confidence float64 `json:"confidence"`
+}
+
+//批量检测
+type BatchPicRecogRsp struct {
+	CommonRsp
+	Data []PicRecogRsp `json:"data"`
+}
 
 var (
 	PublicKey  string
@@ -135,7 +157,23 @@ func UploadFileData(url string, params map[string]string, filename string, src i
 	return
 }
 
-func PicRecog(host string, picRecogType string, filename string, file io.Reader) (res *http.Response, err error) {
+func PicRecog(host string, picRecogType string, filename string, file io.Reader) (brsp *BatchPicRecogRsp, err error) {
 	params := signedRequest(picRecogType, PublicKey, PrivateKey, Userid)
-	return UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, filename, file)
+	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, filename, file)
+	if err != nil {
+		return
+	}
+
+	result, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+
+	err = json.Unmarshal(result, brsp)
+	if err != nil {
+		return
+	}
+
+	return
 }
