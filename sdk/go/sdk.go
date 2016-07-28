@@ -37,7 +37,7 @@ type CommonRsp struct {
 type PicRecogRsp struct {
 	CommonRsp
 	Name       string  `json:"name"`
-	Label      int     `json:"label"`
+	Label      int32   `json:"label"`
 	Confidence float64 `json:"confidence"`
 }
 
