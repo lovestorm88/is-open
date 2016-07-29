@@ -161,17 +161,21 @@ func PicRecog(host string, picRecogType string, filename string, file io.Reader)
 	params := signedRequest(picRecogType, PublicKey, PrivateKey, Userid)
 	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, filename, file)
 	if err != nil {
+		fmt.Printf("PicRecog,err1:%s\n", err.Error())
 		return
 	}
 
 	result, err := ioutil.ReadAll(res.Body)
 	if err != nil {
+		fmt.Printf("PicRecog,err2:%s\n", err.Error())
 		return
 	}
 	defer res.Body.Close()
 
+	fmt.Println(result)
 	err = json.Unmarshal(result, brsp)
 	if err != nil {
+		fmt.Printf("PicRecog,err3:%s\n", err.Error())
 		return
 	}
 
