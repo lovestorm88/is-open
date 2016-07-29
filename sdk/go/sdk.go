@@ -172,7 +172,7 @@ func PicRecog(host string, picRecogType string, filename string, file io.Reader)
 	}
 	defer res.Body.Close()
 
-	fmt.Println(result)
+	fmt.Println(string(result))
 	err = json.Unmarshal(result, brsp)
 	if err != nil {
 		fmt.Printf("PicRecog,err3:%s\n", err.Error())
