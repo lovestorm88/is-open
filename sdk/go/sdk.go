@@ -173,8 +173,8 @@ func PicRecog(host string, picRecogType string, filename string, file io.Reader)
 	defer res.Body.Close()
 
 	fmt.Println(string(result))
-	var r BatchPicRecogRsp
-	err = json.Unmarshal(result, &r)
+	var r *BatchPicRecogRsp
+	err = json.Unmarshal(result, r)
 	if err != nil {
 		fmt.Printf("PicRecog,err3:%s\n", err.Error())
 		return
