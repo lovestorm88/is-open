@@ -157,28 +157,28 @@ func UploadFileData(url string, params map[string]string, filename string, src i
 	return
 }
 
-func PicRecog(host string, picRecogType string, filename string, file io.Reader) (brsp *BatchPicRecogRsp, err error) {
+func PicRecog(host string, picRecogType string, filename string, file io.Reader) (*BatchPicRecogRsp, error) {
 	params := signedRequest(picRecogType, PublicKey, PrivateKey, Userid)
 	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, filename, file)
 	if err != nil {
 		fmt.Printf("PicRecog,err1:%s\n", err.Error())
-		return
+		return nil, err
 	}
 
 	result, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		fmt.Printf("PicRecog,err2:%s\n", err.Error())
-		return
+		return nil, err
 	}
 	defer res.Body.Close()
 
 	fmt.Println(string(result))
-	var r *BatchPicRecogRsp
-	err = json.Unmarshal(result, r)
+	var brsp BatchPicRecogRsp
+	err = json.Unmarshal(result, &brsp)
 	if err != nil {
 		fmt.Printf("PicRecog,err3:%s\n", err.Error())
-		return
+		return nil, err
 	}
 
-	return
+	return &brsp, nil
 }
