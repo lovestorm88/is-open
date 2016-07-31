@@ -83,8 +83,7 @@ func main() {
 		go testPornRecog(&wg, *host, *picPath)
 	}
 
+	wg.Wait()
 	et := time.Now().Unix()
 	log.Printf("total use:%d\n", et-st)
-
-	wg.Wait()
 }
