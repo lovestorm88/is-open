@@ -90,10 +90,8 @@ func signedRequest(uri, publicKey, privateKey, userid string) map[string]string 
 		canonicalized_querys = append(canonicalized_querys, fmt.Sprintf("%s=%s", key, value))
 	}
 
-	canonicalized_query := strings.Join(canonicalized_querys, "&")
-
 	// create the string to sign
-	string_to_sign := METHOD + "\n" + uri + "\n" + canonicalized_query
+	string_to_sign := strings.Join(canonicalized_querys, "&")
 
 	// calculate HMAC with SHA256 and base64-encoding
 	signature := computeHmac256(string_to_sign, privateKey)
