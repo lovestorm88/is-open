@@ -66,9 +66,8 @@ func testPornRecog(wg *sync.WaitGroup, host, rootPath string) {
 		et := time.Now().UnixNano()
 		if err != nil {
 			log.Printf("testPornRecog fail:%s,use:%d,path:%s\n", err.Error(), et-st, path)
-		} else {
-			log.Printf("testPornRecog success,use:%d,path:%s\n", et-st, path)
 		}
+
 		return nil
 	})
 }
