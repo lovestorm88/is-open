@@ -60,11 +60,11 @@ func computeHmac256(message string, secret string) string {
 	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
-func SignedRequest(uri string) map[string]string {
-	return signedRequest(uri, PublicKey, PrivateKey, Userid)
+func SignedRequest() map[string]string {
+	return signedRequest(PublicKey, PrivateKey, Userid)
 }
 
-func signedRequest(uri, publicKey, privateKey, userid string) map[string]string {
+func signedRequest(publicKey, privateKey, userid string) map[string]string {
 	params := make(map[string]string)
 
 	params["publicKey"] = publicKey
@@ -158,7 +158,7 @@ func UploadFileData(url string, params map[string]string, filename string, src i
 }
 
 func PicRecog(host string, picRecogType string, filename string, file io.Reader) (*BatchPicRecogRsp, error) {
-	params := signedRequest(picRecogType, PublicKey, PrivateKey, Userid)
+	params := signedRequest(PublicKey, PrivateKey, Userid)
 	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, filename, file)
 	if err != nil {
 		fmt.Printf("PicRecog,err1:%s\n", err.Error())
