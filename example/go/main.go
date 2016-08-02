@@ -32,17 +32,16 @@ func pornRecog(host, filePath string) int32 {
 	sdk.PrivateKey = PrivateKey
 	sdk.Userid = Userid
 
-	file, err := os.Open(filePath)
-	if err != nil {
-		return -1
-	}
-	defer file.Close()
-
 	filenames := make([]string, 0, *batch)
 	files := make([]io.Reader, 0, *batch)
 	filename := file.Name()
 	for i := 0; i < *batch; i++ {
 		filenames = append(filenames, filename)
+		file, err := os.Open(filePath)
+		if err != nil {
+			return -1
+		}
+		defer file.Close()
 		files = append(files, file)
 	}
 
