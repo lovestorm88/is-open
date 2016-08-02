@@ -160,6 +160,32 @@ func UploadFileData(url string, params map[string]string, filenames []string, sr
 	return
 }
 
+func PicRecog(host string, picRecogType string, filename string, file io.Reader) (*BatchPicRecogRsp, error) {
+	params := signedRequest(PublicKey, PrivateKey, Userid)
+	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, []string{filename}, []io.Reader{file})
+	if err != nil {
+		fmt.Printf("PicRecog,err1:%s\n", err.Error())
+		return nil, err
+	}
+
+	result, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Printf("PicRecog,err2:%s\n", err.Error())
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	fmt.Println(string(result))
+	var brsp BatchPicRecogRsp
+	err = json.Unmarshal(result, &brsp)
+	if err != nil {
+		fmt.Printf("PicRecog,err3:%s\n", err.Error())
+		return nil, err
+	}
+
+	return &brsp, nil
+}
+
 func BatchPicRecog(host string, picRecogType string, filenames []string, files []io.Reader) (*BatchPicRecogRsp, error) {
 	params := signedRequest(PublicKey, PrivateKey, Userid)
 	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, filenames, files)
