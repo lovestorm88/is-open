@@ -105,23 +105,27 @@ func signedRequest(publicKey, privateKey, userid string) map[string]string {
 	return params
 }
 
-func UploadFileData(url string, params map[string]string, filename string, src io.Reader) (res *http.Response, err error) {
+func UploadFileData(url string, params map[string]string, filenames []string, srcs []io.Reader) (res *http.Response, err error) {
 	// Prepare a form that you will submit to that URL.
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
 
-	// Add your image file
-	fw, err := w.CreateFormFile("image", filename)
-	if err != nil {
-		return
-	}
-	if _, err = io.Copy(fw, src); err != nil {
-		return
+	// Add your image files
+	for i, filename := range filenames {
+		fw, err2 := w.CreateFormFile("image", filename)
+		if err != nil {
+			err = err2
+			return
+		}
+		if _, err = io.Copy(fw, srcs[i]); err != nil {
+			return
+		}
 	}
 
 	// Add the other fields
 	for k, v := range params {
-		if fw, err = w.CreateFormField(k); err != nil {
+		if fw, err2 := w.CreateFormField(k); err != nil {
+			err = err2
 			return
 		}
 
@@ -157,9 +161,9 @@ func UploadFileData(url string, params map[string]string, filename string, src i
 	return
 }
 
-func PicRecog(host string, picRecogType string, filename string, file io.Reader) (*BatchPicRecogRsp, error) {
+func BatchPicRecog(host string, picRecogType string, filenames []string, files []io.Reader) (*BatchPicRecogRsp, error) {
 	params := signedRequest(PublicKey, PrivateKey, Userid)
-	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, filename, file)
+	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, filenames, files)
 	if err != nil {
 		fmt.Printf("PicRecog,err1:%s\n", err.Error())
 		return nil, err

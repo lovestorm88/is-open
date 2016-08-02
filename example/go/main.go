@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -24,6 +25,7 @@ var (
 	host     = flag.String("host", "http://localhost:8087", "host url")
 	picPath  = flag.String("path", "../resource", "pictures path")
 	cocurent = flag.Int("cocurrent", 1, "cocurrent number")
+	batch    = flag.Int("batch", 1, "batch number")
 )
 
 func pornRecog(host, filePath string) error {
@@ -38,8 +40,15 @@ func pornRecog(host, filePath string) error {
 	}
 	defer file.Close()
 
+	filenames := make([]string, 0, *batch)
+	files := make([]io.Reader, 0, *batch)
 	filename := file.Name()
-	brsp, err := sdk.PicRecog(host, sdk.PIC_RECOG_PORN, filename, file)
+	for i := 0; i < *batch; i++ {
+		filenames = append(filenames, filename)
+		files = append(files, file)
+	}
+
+	brsp, err := sdk.BatchPicRecog(host, sdk.PIC_RECOG_PORN, filenames, files)
 	if err != nil {
 		fmt.Println("UploadFileData err")
 		return err
