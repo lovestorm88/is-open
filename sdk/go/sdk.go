@@ -95,11 +95,11 @@ func signedRequest(publicKey, privateKey, userid string) map[string]string {
 
 	// calculate HMAC with SHA256 and base64-encoding
 	signature := computeHmac256(string_to_sign, privateKey)
-	fmt.Printf("string_to_sign:%s,privateKey:%s,signature:%s,", string_to_sign, privateKey, signature)
+	//fmt.Printf("string_to_sign:%s,privateKey:%s,signature:%s,", string_to_sign, privateKey, signature)
 
 	// encode the signature for the request
 	signature = url.QueryEscape(signature)
-	fmt.Printf("signature_escape:%s\n", signature)
+	//fmt.Printf("signature_escape:%s\n", signature)
 	params["signature"] = signature
 
 	return params
