@@ -95,11 +95,11 @@ func signedRequest(publicKey, privateKey, userid string) map[string]string {
 
 	// calculate HMAC with SHA256 and base64-encoding
 	signature := computeHmac256(string_to_sign, privateKey)
-	fmt.Printf("string_to_sign:%s,privateKey:%s,signature:%s,", string_to_sign, privateKey, signature)
+	//fmt.Printf("string_to_sign:%s,privateKey:%s,signature:%s,", string_to_sign, privateKey, signature)
 
 	// encode the signature for the request
 	signature = url.QueryEscape(signature)
-	fmt.Printf("signature_escape:%s\n", signature)
+	//fmt.Printf("signature_escape:%s\n", signature)
 	params["signature"] = signature
 
 	return params
@@ -108,13 +108,13 @@ func signedRequest(publicKey, privateKey, userid string) map[string]string {
 func UploadFileData(url string, params map[string]string, filenames []string, srcs []io.Reader) (res *http.Response, err error) {
 	// Prepare a form that you will submit to that URL.
 	var b bytes.Buffer
+	var fw io.Writer
 	w := multipart.NewWriter(&b)
 
 	// Add your image files
 	for i, filename := range filenames {
-		fw, err2 := w.CreateFormFile("image", filename)
+		fw, err = w.CreateFormFile("image", filename)
 		if err != nil {
-			err = err2
 			return
 		}
 		if _, err = io.Copy(fw, srcs[i]); err != nil {
@@ -124,8 +124,7 @@ func UploadFileData(url string, params map[string]string, filenames []string, sr
 
 	// Add the other fields
 	for k, v := range params {
-		if fw, err2 := w.CreateFormField(k); err != nil {
-			err = err2
+		if fw, err = w.CreateFormField(k); err != nil {
 			return
 		}
 

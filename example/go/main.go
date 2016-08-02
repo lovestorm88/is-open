@@ -28,15 +28,14 @@ var (
 	batch    = flag.Int("batch", 1, "batch number")
 )
 
-func pornRecog(host, filePath string) error {
+func pornRecog(host, filePath string) int32 {
 	sdk.PublicKey = PublicKey
 	sdk.PrivateKey = PrivateKey
 	sdk.Userid = Userid
 
 	file, err := os.Open(filePath)
 	if err != nil {
-		fmt.Println("os.Open err")
-		return err
+		return -1
 	}
 	defer file.Close()
 
@@ -50,17 +49,16 @@ func pornRecog(host, filePath string) error {
 
 	brsp, err := sdk.BatchPicRecog(host, sdk.PIC_RECOG_PORN, filenames, files)
 	if err != nil {
-		fmt.Println("UploadFileData err")
-		return err
+		return -2
 	}
 
-	fmt.Println(brsp)
-
-	return err
+	return brsp.ErrCode
 }
 
-func testPornRecog(wg *sync.WaitGroup, host, rootPath string) {
+func testPornRecog(index int, wg *sync.WaitGroup, host, rootPath string) {
 	defer wg.Done()
+
+	errCodes := make(map[int32]int)
 
 	filepath.Walk(rootPath, func(path string, fi os.FileInfo, err error) error {
 		if fi == nil {
@@ -70,15 +68,14 @@ func testPornRecog(wg *sync.WaitGroup, host, rootPath string) {
 			return nil
 		}
 
-		st := time.Now().UnixNano()
-		err = pornRecog(host, path)
-		et := time.Now().UnixNano()
-		if err != nil {
-			log.Printf("testPornRecog fail:%s,use:%d,path:%s\n", err.Error(), et-st, path)
-		}
+		errCode := pornRecog(host, path)
+		errCodes[errCode] += 1
 
 		return nil
 	})
+
+	log.Printf("index:%d,result:%v", index, errCodes)
+
 }
 
 func main() {
@@ -88,7 +85,7 @@ func main() {
 	st := time.Now().Unix()
 	for i := 0; i < *cocurent; i++ {
 		wg.Add(1)
-		go testPornRecog(&wg, *host, *picPath)
+		go testPornRecog(i, &wg, *host, *picPath)
 	}
 
 	wg.Wait()
