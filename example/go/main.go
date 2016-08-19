@@ -24,7 +24,7 @@ const (
 var (
 	host     = flag.String("host", "http://localhost:8087", "host url")
 	picPath  = flag.String("path", "../resource", "pictures path")
-	imgUrls  = flag.String("url", "", "img urls")
+	urls     = flag.String("url", "", "img urls")
 	cocurent = flag.Int("cocurrent", 1, "cocurrent number")
 	batch    = flag.Int("batch", 1, "batch number")
 )
@@ -80,7 +80,7 @@ func testPornRecog(index int, wg *sync.WaitGroup, host, rootPath string) {
 }
 
 func testPornRecogByImgUrls() {
-	if *imgUrls == "" {
+	if *urls == "" {
 		return
 	}
 
@@ -88,7 +88,9 @@ func testPornRecogByImgUrls() {
 	sdk.PrivateKey = PrivateKey
 	sdk.Userid = Userid
 
-	brsp, err := sdk.BatchPicRecogByImgUrls(*host, sdk.PIC_RECOG_PORN, strings.Split(*imgUrls, ";"))
+	imgUrls := strings.Split(*imgUrls, ";")
+	log.Printf("imgUrls:%v", imgUrls)
+	brsp, err := sdk.BatchPicRecogByImgUrls(*host, sdk.PIC_RECOG_PORN, imgUrls)
 	if err != nil {
 		log.Printf("testPornRecogByImgUrls,err:%s\n", err.Error())
 		return
