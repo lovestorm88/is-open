@@ -88,7 +88,7 @@ func testPornRecogByImgUrls() {
 	sdk.PrivateKey = PrivateKey
 	sdk.Userid = Userid
 
-	imgUrls := strings.Split(*imgUrls, ";")
+	imgUrls := strings.Split(*urls, ";")
 	log.Printf("imgUrls:%v", imgUrls)
 	brsp, err := sdk.BatchPicRecogByImgUrls(*host, sdk.PIC_RECOG_PORN, imgUrls)
 	if err != nil {
