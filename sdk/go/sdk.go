@@ -269,7 +269,7 @@ func BatchPicRecog(host string, picRecogType string, filenames []string, files [
 
 func BatchPicRecogByImgUrls(host string, picRecogType string, imgUrls []string) (*BatchPicRecogRsp, error) {
 	params := signedRequest(PublicKey, PrivateKey, Userid)
-	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, imgUrls)
+	res, err := UploadImgUrls(fmt.Sprintf("%s%s", host, picRecogType), params, imgUrls)
 	if err != nil {
 		fmt.Printf("BatchPicRecogByImgUrls,err1:%s\n", err.Error())
 		return nil, err
