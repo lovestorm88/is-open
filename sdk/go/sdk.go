@@ -160,6 +160,61 @@ func UploadFileData(url string, params map[string]string, filenames []string, sr
 	return
 }
 
+func UploadImgUrls(url string, params map[string]string, imgUrls []string) (res *http.Response, err error) {
+	// Prepare a form that you will submit to that URL.
+	var b bytes.Buffer
+	var fw io.Writer
+	w := multipart.NewWriter(&b)
+
+	// Add your image urls
+	for _, imgUrl := range imgUrls {
+		if fw, err = w.CreateFormField("image"); err != nil {
+			return
+		}
+
+		if _, err = fw.Write([]byte(imgUrl)); err != nil {
+			return
+		}
+	}
+
+	// Add the other fields
+	for k, v := range params {
+		if fw, err = w.CreateFormField(k); err != nil {
+			return
+		}
+
+		if _, err = fw.Write([]byte(v)); err != nil {
+			return
+		}
+	}
+
+	// Don't forget to close the multipart writer.
+	// If you don't close it, your request will be missing the terminating boundary.
+	w.Close()
+
+	// Now that you have a form, you can submit it to your handler.
+	req, err := http.NewRequest(METHOD, url, &b)
+	if err != nil {
+		return
+	}
+	// Don't forget to set the content type, this will contain the boundary.
+	req.Header.Set("Content-Type", w.FormDataContentType())
+
+	// Submit the request
+	client := &http.Client{}
+	res, err = client.Do(req)
+	if err != nil {
+		return
+	}
+
+	// Check the response
+	if res.StatusCode != http.StatusOK {
+		err = fmt.Errorf("bad status: %s", res.Status)
+	}
+
+	return
+}
+
 func PicRecog(host string, picRecogType string, filename string, file io.Reader) (*BatchPicRecogRsp, error) {
 	params := signedRequest(PublicKey, PrivateKey, Userid)
 	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, []string{filename}, []io.Reader{file})
@@ -190,13 +245,13 @@ func BatchPicRecog(host string, picRecogType string, filenames []string, files [
 	params := signedRequest(PublicKey, PrivateKey, Userid)
 	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, filenames, files)
 	if err != nil {
-		fmt.Printf("PicRecog,err1:%s\n", err.Error())
+		fmt.Printf("BatchPicRecog,err1:%s\n", err.Error())
 		return nil, err
 	}
 
 	result, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Printf("PicRecog,err2:%s\n", err.Error())
+		fmt.Printf("BatchPicRecog,err2:%s\n", err.Error())
 		return nil, err
 	}
 	defer res.Body.Close()
@@ -205,7 +260,33 @@ func BatchPicRecog(host string, picRecogType string, filenames []string, files [
 	var brsp BatchPicRecogRsp
 	err = json.Unmarshal(result, &brsp)
 	if err != nil {
-		fmt.Printf("PicRecog,err3:%s\n", err.Error())
+		fmt.Printf("BatchPicRecog,err3:%s\n", err.Error())
+		return nil, err
+	}
+
+	return &brsp, nil
+}
+
+func BatchPicRecogByImgUrls(host string, picRecogType string, imgUrls []string) (*BatchPicRecogRsp, error) {
+	params := signedRequest(PublicKey, PrivateKey, Userid)
+	res, err := UploadFileData(fmt.Sprintf("%s%s", host, picRecogType), params, imgUrls)
+	if err != nil {
+		fmt.Printf("BatchPicRecogByImgUrls,err1:%s\n", err.Error())
+		return nil, err
+	}
+
+	result, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Printf("BatchPicRecogByImgUrls,err2:%s\n", err.Error())
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	fmt.Println(string(result))
+	var brsp BatchPicRecogRsp
+	err = json.Unmarshal(result, &brsp)
+	if err != nil {
+		fmt.Printf("BatchPicRecogByImgUrls,err3:%s\n", err.Error())
 		return nil, err
 	}
 
