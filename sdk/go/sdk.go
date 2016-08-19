@@ -35,7 +35,8 @@ type CommonRsp struct {
 
 //图片检测
 type PicRecogRsp struct {
-	CommonRsp
+	ErrCode    int32   `json:"errCode"`
+	Msg        string  `json:"msg"`
 	Name       string  `json:"name"`
 	Label      int32   `json:"label"`
 	Confidence float64 `json:"confidence"`
@@ -43,8 +44,9 @@ type PicRecogRsp struct {
 
 //批量检测
 type BatchPicRecogRsp struct {
-	CommonRsp
-	Data []PicRecogRsp `json:"data"`
+	ErrCode int32         `json:"errCode"`
+	Msg     string        `json:"msg"`
+	Data    []PicRecogRsp `json:"data"`
 }
 
 var (
