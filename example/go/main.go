@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -87,7 +88,7 @@ func testPornRecogByImgUrls() {
 	sdk.PrivateKey = PrivateKey
 	sdk.Userid = Userid
 
-	brsp, err := sdk.BatchPicRecogByImgUrls(host, sdk.PIC_RECOG_PORN, *imgUrls)
+	brsp, err := sdk.BatchPicRecogByImgUrls(*host, sdk.PIC_RECOG_PORN, strings.Split(*imgUrls, ";"))
 	if err != nil {
 		log.Printf("testPornRecogByImgUrls,err:%s\n", err.Error())
 		return
